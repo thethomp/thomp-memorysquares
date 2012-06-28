@@ -65,7 +65,7 @@ def main():
 		drawBoard(mainBoard, revealedBoxes)
 		
 		for event in pygame.event.get():
-			if event.type == QUIT or (even.type == KEYUP and event.key ++ K_ESCAPE):
+			if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
 				pygame.quit()
 				sys.exit()
 			elif event.type == MOUSEMOTION:
@@ -74,7 +74,7 @@ def main():
 				mousex, mousey = event.pos
 				mouseClicked = True
 
-			boxx, boxy = getBoxAtPixel(mousex, mousey):
+			boxx, boxy = getBoxAtPixel(mousex, mousey)
 			if boxx != None and boxy != None:
 				if not revealedBoxes[boxx][boxy]:
 					drawHighlightBox(boxx, boxy)
@@ -111,7 +111,7 @@ def main():
 def generateRevealedBoxesData( val ):
 	revealedBoxes = []
 	for i in range(BOARDWIDTH):
-		revealedBoxes.append(pval] * BOARDHEIGHT)
+		revealedBoxes.append([val] * BOARDHEIGHT)
 	return revealedBoxes
 
 def getRandomizedBoard():
@@ -144,7 +144,16 @@ def leftTopCoordsOfBox(boxx, boxy):
 	top = boxy * (BOXSIZE + GAPSIZE) + YMARGIN
 	return (left, top)
 
-def getBoxAtPixel(shape, color, boxx, boxy):
+def getBoxAtPixel(x,y):
+	for boxx in range(BOARDWIDTH):
+		for boxy in range(BOARDHEIGHT):
+			left,top = leftTopCoordsOfBox(boxx,boxy)
+			boxRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE)
+			if boxRect.collidepoint(x,y):
+				return (boxx, boxy)
+	return (None, None)
+
+def drawIcon(shape, color, boxx, boxy):
 	quarter = int(BOXSIZE * 0.25)
 	half = int(BOXSIZE * 0.5)
 	
@@ -170,7 +179,7 @@ def getShapeAndColor(board, boxx, boxy):
 def drawBoxCovers( board, boxes, coverage ):
 	for box in boxes:
 		left, top = leftTopCoordsOfBox(box[0], box[1])
-		pygame.draw.rect(DISPLAYSURF, BGCOLOR, (left, top BOXSIZE, BOXSIZE))
+		pygame.draw.rect(DISPLAYSURF, BGCOLOR, (left, top, BOXSIZE, BOXSIZE))
 		shape, color = getShapeAndColor(board, box[0], box[1])
 		drawIcon(shape, color, box[0], box[1])
 		if coverage > 0:
@@ -201,7 +210,7 @@ def drawHighlightBox(boxx, boxy):
 	pygame.draw.rect(DISPLAYSURF, HIGHLIGHTCOLOR, (left - 5, top - 5, BOXSIZE + 10, BOXSIZE + 10), 4)
 
 def startGameAnimation(board):
-	coveredBoxes = generateRevealedBoxesDelta(False)
+	coveredBoxes = generateRevealedBoxesData(False)
 	boxes = []
 	for x in range(BOARDWIDTH):
 		for y in range(BOARDHEIGHT):
@@ -232,5 +241,5 @@ def hasWon( revealedBoxes ):
 			return False
 	return True
 
-if __name__ -- '__main__':
+if __name__ == '__main__':
 	main()	
